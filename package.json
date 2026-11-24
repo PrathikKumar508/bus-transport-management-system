@@ -1,0 +1,14 @@
+{
+  "name": "college-bus-transport-management-system",
+  "private": true,
+  "version": "0.1.0",
+  "description": "College Bus and Transport Management System",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "test": "npm run test --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
