@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 const stats = ['Total buses', 'Total drivers', 'Total students', 'Active allocations'];
 const emptyBus = { busNumber: '', registrationNumber: '', capacity: '', status: 'available' };
-const emptyDriver = { name: '', licenseNumber: '', phone: '', email: '', status: 'available' };
+const emptyDriver = { name: '', licenseNumber: '', phone: '', email: '', password: '', status: 'available' };
 
 function ArrowUpRight() {
   return <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 13 13 3M5 3h8v8" /></svg>;
@@ -12,7 +12,7 @@ function BusMark() {
   return <span className="brand-mark" aria-hidden="true"><span /></span>;
 }
 
-function Landing({ onLogin }) {
+function Landing({ onShowRoles, onRoleSelect }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [spotlightX, setSpotlightX] = useState(null);
   const [activeNav, setActiveNav] = useState(0);
@@ -61,7 +61,7 @@ function Landing({ onLogin }) {
         <button className={activeNav === 1 ? 'nav-active' : ''} onClick={() => { setActiveNav(1); scrollToSection('about'); }}>About</button>
         <button className={activeNav === 2 ? 'nav-active' : ''} onClick={() => { setActiveNav(2); scrollToSection('roles'); }}>Features</button>
         <button className={activeNav === 3 ? 'nav-active' : ''} onClick={() => { setActiveNav(3); scrollToSection('how-it-works'); }}>How it works</button>
-        <button className="nav-login" onClick={onLogin}>Login <ArrowUpRight /></button>
+        <button className="nav-login" onClick={onShowRoles}>Login <ArrowUpRight /></button>
       </div>
     </nav>
 
@@ -72,7 +72,7 @@ function Landing({ onLogin }) {
           <h1>College transportation.<br /><em>Simplified.</em></h1>
           <p className="hero-description">One centralized platform to manage college transportation for administrators, students and drivers.</p>
           <div className="hero-actions">
-            <button className="primary-button" onClick={onLogin}>Get started <ArrowUpRight /></button>
+            <button className="primary-button" onClick={onShowRoles}>Get started <ArrowUpRight /></button>
             <button className="text-button" onClick={() => scrollToSection('roles')}>Explore features <span>↓</span></button>
           </div>
         </div>
@@ -115,9 +115,9 @@ function Landing({ onLogin }) {
       <section className="roles-section" id="roles">
         <div className="section-heading"><div><p className="section-label">/ Built for every journey</p><h2>One platform.<br /><span>Three perspectives.</span></h2></div><p>Designed around the people who keep college transportation moving.</p></div>
         <div className="role-grid">
-          <RoleCard number="01" title="Admin" accent="admin" description="Manage the complete transport operation from one central dashboard." items={['Buses and drivers', 'Routes and stops', 'Schedules and allocations']} />
-          <RoleCard number="02" title="Student" accent="student" description="Find the transport details that matter to your college day." items={['Allocated bus', 'Route and stop information', 'Personal schedule']} />
-          <RoleCard number="03" title="Driver" accent="driver" description="See every assignment clearly before heading out on the road." items={['Assigned bus details', 'Routes and stops', 'Trip schedules']} />
+          <RoleCard number="01" title="Admin" accent="admin" description="Manage the complete transport operation from one central dashboard." items={['Buses and drivers', 'Routes and stops', 'Schedules and allocations']} onSelect={() => onRoleSelect('admin')} />
+          <RoleCard number="02" title="Student" accent="student" description="Find the transport details that matter to your college day." items={['Allocated bus', 'Route and stop information', 'Personal schedule']} onSelect={() => onRoleSelect('student')} />
+          <RoleCard number="03" title="Driver" accent="driver" description="See every assignment clearly before heading out on the road." items={['Assigned bus details', 'Routes and stops', 'Trip schedules']} onSelect={() => onRoleSelect('driver')} />
         </div>
       </section>
 
@@ -127,19 +127,21 @@ function Landing({ onLogin }) {
       </section>
     </main>
 
-    <footer className="landing-footer"><div className="footer-brand"><BusMark /><strong>CTMS</strong><p>Clearer transport management<br />for every college journey.</p></div><div className="footer-links"><div><span>Explore</span><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Home</button><button onClick={() => scrollToSection('about')}>About</button><button onClick={() => scrollToSection('roles')}>Features</button></div><div><span>Access</span><button onClick={onLogin}>Login</button><button onClick={() => scrollToSection('how-it-works')}>How it works</button></div></div><div className="footer-bottom"><span>College project attribution placeholder</span><span>© 2025 CTMS. Built for better journeys.</span></div></footer>
+    <footer className="landing-footer"><div className="footer-brand"><BusMark /><strong>CTMS</strong><p>Clearer transport management<br />for every college journey.</p></div><div className="footer-links"><div><span>Explore</span><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Home</button><button onClick={() => scrollToSection('about')}>About</button><button onClick={() => scrollToSection('roles')}>Features</button></div><div><span>Access</span><button onClick={onShowRoles}>Login</button><button onClick={() => scrollToSection('how-it-works')}>How it works</button></div></div><div className="footer-bottom"><span>College project attribution placeholder</span><span>© 2025 CTMS. Built for better journeys.</span></div></footer>
   </div>;
 }
 
-function RoleCard({ number, title, accent, description, items }) {
-  return <article className={`role-card role-${accent}`}><div className="card-top"><span>{number}</span><ArrowUpRight /></div><div className="role-icon">{accent === 'admin' ? '⌘' : accent === 'student' ? '◌' : '↗'}</div><h3>{title}</h3><p>{description}</p><ul>{items.map((item) => <li key={item}><span>+</span>{item}</li>)}</ul></article>;
+function RoleCard({ number, title, accent, description, items, onSelect }) {
+  return <article className={`role-card role-${accent}`} role="link" tabIndex="0" onClick={onSelect} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onSelect(); } }}><div className="card-top"><span>{number}</span><ArrowUpRight /></div><div className="role-icon">{accent === 'admin' ? '⌘' : accent === 'student' ? '◌' : '↗'}</div><h3>{title}</h3><p>{description}</p><ul>{items.map((item) => <li key={item}><span>+</span>{item}</li>)}</ul></article>;
 }
 
 function Step({ number, title, text }) {
   return <article className="step-card"><span className="step-number">{number}</span><div><h3>{title}</h3><p>{text}</p></div><ArrowUpRight /></article>;
 }
 
-function Login({ onLogin, onBack }) {
+const roleLabels = { admin: 'Admin', student: 'Student', driver: 'Driver' };
+
+function Login({ role, onLogin, onBack, onRegister }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
@@ -148,7 +150,7 @@ function Login({ onLogin, onBack }) {
     event.preventDefault();
     setMessage('Signing in...');
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+      const response = await fetch('http://localhost:5000/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, role }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Unable to sign in');
       localStorage.setItem('transport_token', data.token);
@@ -156,7 +158,26 @@ function Login({ onLogin, onBack }) {
     } catch (error) { setMessage(error.message); }
   }
 
-  return <main className="auth-page"><button className="back-button" onClick={onBack}>← Back to home</button><section className="auth-card"><p className="eyebrow">College transport</p><h1>Sign in</h1><p className="muted">Access your transport management dashboard.</p><form onSubmit={handleSubmit} className="form-stack"><label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label><label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label><button type="submit">Sign in</button></form>{message && <p className="status-message">{message}</p>}</section></main>;
+  return <main className="auth-page"><button className="back-button" onClick={onBack}>← Back to roles</button><section className="auth-card"><p className="eyebrow">{roleLabels[role]} access</p><h1>{roleLabels[role]} Login</h1><p className="muted">Sign in to your CTMS {roleLabels[role].toLowerCase()} dashboard.</p><form onSubmit={handleSubmit} className="form-stack"><label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label><label>Password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label><button type="submit">Login as {roleLabels[role]}</button></form>{role === 'student' && <p className="auth-note">Need an account? <button className="auth-link" type="button" onClick={onRegister}>Create a student account</button></p>}{role === 'driver' && <p className="auth-note">Driver accounts are created by an administrator.</p>}{role === 'admin' && <p className="auth-note">Admin accounts are provisioned privately.</p>}{message && <p className="status-message">{message}</p>}</section></main>;
+}
+
+function StudentRegister({ onRegistered, onBack }) {
+  const [form, setForm] = useState({ name: '', studentId: '', department: '', year: '', phone: '', email: '', password: '' });
+  const [message, setMessage] = useState('');
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setMessage('Creating account...');
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, role: 'student' }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Unable to create account');
+      localStorage.setItem('transport_token', data.token);
+      onRegistered(data.user);
+    } catch (error) { setMessage(error.message); }
+  }
+
+  return <main className="auth-page"><button className="back-button" onClick={onBack}>← Back to student login</button><section className="auth-card register-card"><p className="eyebrow">Student registration</p><h1>Create account</h1><p className="muted">Register your student transport profile.</p><form onSubmit={handleSubmit} className="form-stack"><label>Full name<input value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} required /></label><label>Student ID<input value={form.studentId} onChange={(event) => setForm({ ...form, studentId: event.target.value })} required /></label><div className="form-row"><label>Department<input value={form.department} onChange={(event) => setForm({ ...form, department: event.target.value })} required /></label><label>Year<input value={form.year} onChange={(event) => setForm({ ...form, year: event.target.value })} required /></label></div><label>Phone<input value={form.phone} onChange={(event) => setForm({ ...form, phone: event.target.value })} /></label><label>Email<input type="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} required /></label><label>Password<input type="password" minLength="8" value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} required /></label><button type="submit">Create student account</button></form>{message && <p className="status-message">{message}</p>}</section></main>;
 }
 
 function AdminDashboard({ user, onLogout }) {
@@ -174,14 +195,52 @@ function AdminDashboard({ user, onLogout }) {
     { label: 'Total students', value: 0, detail: 'Student module coming next' },
     { label: 'Active allocations', value: 0, detail: 'Allocation module coming next' },
   ];
-  return <main className="dashboard-page admin-dashboard"><header className="topbar"><div><p className="eyebrow">Admin workspace</p><h1>Transport dashboard</h1></div><div className="topbar-actions"><span>{user.name}</span><button className="secondary-button" onClick={onLogout}>Sign out</button></div></header><section className="welcome-panel"><div><p className="eyebrow">Overview</p><h2>Good to see you, {user.name}.</h2><p className="muted">Manage the college transport system from one place.</p></div><span className="role-badge">Administrator</span></section><section className="stats-grid" aria-label="Transport statistics">{dashboardStats.map((stat) => <article className="stat-card" key={stat.label}><p className="muted">{stat.label}</p><strong>{stat.value}</strong><small>{stat.detail}</small></article>)}</section><section className="bus-section"><div><p className="eyebrow">Transport records</p><h2>Bus management</h2></div><form className="bus-form" onSubmit={handleBusSubmit}><input placeholder="Bus number" value={busForm.busNumber} onChange={(event) => setBusForm({ ...busForm, busNumber: event.target.value })} required /><input placeholder="Registration number" value={busForm.registrationNumber} onChange={(event) => setBusForm({ ...busForm, registrationNumber: event.target.value })} required /><input type="number" min="1" placeholder="Capacity" value={busForm.capacity} onChange={(event) => setBusForm({ ...busForm, capacity: event.target.value })} required /><select value={busForm.status} onChange={(event) => setBusForm({ ...busForm, status: event.target.value })}><option value="available">Available</option><option value="active">Active</option><option value="maintenance">Maintenance</option></select><button type="submit">{editingId ? 'Update bus' : 'Add bus'}</button></form>{busMessage && <p className="status-message">{busMessage}</p>}<div className="table-wrap"><table><thead><tr><th>Bus number</th><th>Registration</th><th>Capacity</th><th>Status</th><th>Action</th></tr></thead><tbody>{buses.map((bus) => <tr key={bus._id}><td>{bus.busNumber}</td><td>{bus.registrationNumber}</td><td>{bus.capacity}</td><td>{bus.status}</td><td><button className="secondary-button" onClick={() => { setEditingId(bus._id); setBusForm({ busNumber: bus.busNumber, registrationNumber: bus.registrationNumber, capacity: bus.capacity, status: bus.status }); }}>Edit</button> <button className="danger-button" onClick={() => handleBusDelete(bus._id)}>Delete</button></td></tr>)}{!buses.length && <tr><td colSpan="5" className="empty-cell">No buses have been added yet.</td></tr>}</tbody></table></div></section><section className="bus-section"><div><p className="eyebrow">People records</p><h2>Driver management</h2></div><form className="bus-form driver-form" onSubmit={handleDriverSubmit}><input placeholder="Full name" value={driverForm.name} onChange={(event) => setDriverForm({ ...driverForm, name: event.target.value })} required /><input placeholder="License number" value={driverForm.licenseNumber} onChange={(event) => setDriverForm({ ...driverForm, licenseNumber: event.target.value })} required /><input placeholder="Phone" value={driverForm.phone} onChange={(event) => setDriverForm({ ...driverForm, phone: event.target.value })} required /><input type="email" placeholder="Email" value={driverForm.email} onChange={(event) => setDriverForm({ ...driverForm, email: event.target.value })} required /><select value={driverForm.status} onChange={(event) => setDriverForm({ ...driverForm, status: event.target.value })}><option value="available">Available</option><option value="assigned">Assigned</option><option value="inactive">Inactive</option></select><button type="submit">{editingDriverId ? 'Update driver' : 'Add driver'}</button></form>{driverMessage && <p className="status-message">{driverMessage}</p>}<div className="table-wrap"><table><thead><tr><th>Name</th><th>License</th><th>Phone</th><th>Email</th><th>Status</th><th>Action</th></tr></thead><tbody>{drivers.map((driver) => <tr key={driver._id}><td>{driver.name}</td><td>{driver.licenseNumber}</td><td>{driver.phone}</td><td>{driver.email}</td><td>{driver.status}</td><td><button className="secondary-button" onClick={() => { setEditingDriverId(driver._id); setDriverForm({ name: driver.name, licenseNumber: driver.licenseNumber, phone: driver.phone, email: driver.email, status: driver.status }); }}>Edit</button> <button className="danger-button" onClick={() => handleDriverDelete(driver._id)}>Delete</button></td></tr>)}{!drivers.length && <tr><td colSpan="6" className="empty-cell">No drivers have been added yet.</td></tr>}</tbody></table></div></section></main>;
+  return <main className="dashboard-page admin-dashboard"><header className="topbar"><div><p className="eyebrow">Admin workspace</p><h1>Transport dashboard</h1></div><div className="topbar-actions"><span>{user.name}</span><button className="secondary-button" onClick={onLogout}>Sign out</button></div></header><section className="welcome-panel"><div><p className="eyebrow">Overview</p><h2>Good to see you, {user.name}.</h2><p className="muted">Manage the college transport system from one place.</p></div><span className="role-badge">Administrator</span></section><section className="stats-grid" aria-label="Transport statistics">{dashboardStats.map((stat) => <article className="stat-card" key={stat.label}><p className="muted">{stat.label}</p><strong>{stat.value}</strong><small>{stat.detail}</small></article>)}</section><section className="bus-section"><div><p className="eyebrow">Transport records</p><h2>Bus management</h2></div><form className="bus-form" onSubmit={handleBusSubmit}><input placeholder="Bus number" value={busForm.busNumber} onChange={(event) => setBusForm({ ...busForm, busNumber: event.target.value })} required /><input placeholder="Registration number" value={busForm.registrationNumber} onChange={(event) => setBusForm({ ...busForm, registrationNumber: event.target.value })} required /><input type="number" min="1" placeholder="Capacity" value={busForm.capacity} onChange={(event) => setBusForm({ ...busForm, capacity: event.target.value })} required /><select value={busForm.status} onChange={(event) => setBusForm({ ...busForm, status: event.target.value })}><option value="available">Available</option><option value="active">Active</option><option value="maintenance">Maintenance</option></select><button type="submit">{editingId ? 'Update bus' : 'Add bus'}</button></form>{busMessage && <p className="status-message">{busMessage}</p>}<div className="table-wrap"><table><thead><tr><th>Bus number</th><th>Registration</th><th>Capacity</th><th>Status</th><th>Action</th></tr></thead><tbody>{buses.map((bus) => <tr key={bus._id}><td>{bus.busNumber}</td><td>{bus.registrationNumber}</td><td>{bus.capacity}</td><td>{bus.status}</td><td><button className="secondary-button" onClick={() => { setEditingId(bus._id); setBusForm({ busNumber: bus.busNumber, registrationNumber: bus.registrationNumber, capacity: bus.capacity, status: bus.status }); }}>Edit</button> <button className="danger-button" onClick={() => handleBusDelete(bus._id)}>Delete</button></td></tr>)}{!buses.length && <tr><td colSpan="5" className="empty-cell">No buses have been added yet.</td></tr>}</tbody></table></div></section><section className="bus-section"><div><p className="eyebrow">People records</p><h2>Driver management</h2></div><form className="bus-form driver-form" onSubmit={handleDriverSubmit}><input placeholder="Full name" value={driverForm.name} onChange={(event) => setDriverForm({ ...driverForm, name: event.target.value })} required /><input placeholder="License number" value={driverForm.licenseNumber} onChange={(event) => setDriverForm({ ...driverForm, licenseNumber: event.target.value })} required /><input placeholder="Phone" value={driverForm.phone} onChange={(event) => setDriverForm({ ...driverForm, phone: event.target.value })} required /><input type="email" placeholder="Email" value={driverForm.email} onChange={(event) => setDriverForm({ ...driverForm, email: event.target.value })} required /><input type="password" placeholder={editingDriverId ? 'New password (optional)' : 'Temporary password'} value={driverForm.password} onChange={(event) => setDriverForm({ ...driverForm, password: event.target.value })} required={!editingDriverId} /><select value={driverForm.status} onChange={(event) => setDriverForm({ ...driverForm, status: event.target.value })}><option value="available">Available</option><option value="assigned">Assigned</option><option value="inactive">Inactive</option></select><button type="submit">{editingDriverId ? 'Update driver' : 'Add driver'}</button></form>{driverMessage && <p className="status-message">{driverMessage}</p>}<div className="table-wrap"><table><thead><tr><th>Name</th><th>License</th><th>Phone</th><th>Email</th><th>Status</th><th>Action</th></tr></thead><tbody>{drivers.map((driver) => <tr key={driver._id}><td>{driver.name}</td><td>{driver.licenseNumber}</td><td>{driver.phone}</td><td>{driver.email}</td><td>{driver.status}</td><td><button className="secondary-button" onClick={() => { setEditingDriverId(driver._id); setDriverForm({ name: driver.name, licenseNumber: driver.licenseNumber, phone: driver.phone, email: driver.email, password: '', status: driver.status }); }}>Edit</button> <button className="danger-button" onClick={() => handleDriverDelete(driver._id)}>Delete</button></td></tr>)}{!drivers.length && <tr><td colSpan="6" className="empty-cell">No drivers have been added yet.</td></tr>}</tbody></table></div></section></main>;
 }
 
 export default function App() {
-  const [view, setView] = useState('landing');
+  const [path, setPath] = useState(window.location.pathname);
   const [user, setUser] = useState(null);
-  function handleLogout() { localStorage.removeItem('transport_token'); setUser(null); setView('landing'); }
-  if (user?.role === 'admin') return <AdminDashboard user={user} onLogout={handleLogout} />;
-  if (view === 'login') return <Login onLogin={setUser} onBack={() => setView('landing')} />;
-  return <Landing onLogin={() => setView('login')} />;
+  useEffect(() => {
+    const handleHistoryChange = () => setPath(window.location.pathname);
+    window.addEventListener('popstate', handleHistoryChange);
+    return () => window.removeEventListener('popstate', handleHistoryChange);
+  }, []);
+
+  function navigate(nextPath) {
+    window.history.pushState({}, '', nextPath);
+    setPath(nextPath);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showRoles() {
+    if (path !== '/') navigate('/');
+    window.setTimeout(() => document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth' }), path === '/' ? 0 : 80);
+  }
+
+  function handleLoginSuccess(loggedInUser) {
+    setUser(loggedInUser);
+    navigate(`/dashboard/${loggedInUser.role}`);
+  }
+
+  function returnToRoles() {
+    navigate('/');
+    window.setTimeout(() => document.getElementById('roles')?.scrollIntoView({ behavior: 'smooth' }), 80);
+  }
+
+  function openStudentRegistration() {
+    navigate('/register/student');
+  }
+
+  if (user?.role === 'admin' && path === '/dashboard/admin') return <AdminDashboard user={user} onLogout={() => { localStorage.removeItem('transport_token'); setUser(null); navigate('/'); }} />;
+  if (user && path === `/dashboard/${user.role}` && user.role !== 'admin') return <RoleDashboardNotice role={user.role} onLogout={() => { localStorage.removeItem('transport_token'); setUser(null); navigate('/'); }} />;
+  const loginMatch = path.match(/^\/login\/(admin|student|driver)$/);
+  if (path === '/register/student') return <StudentRegister onRegistered={handleLoginSuccess} onBack={() => navigate('/login/student')} />;
+  if (loginMatch) return <Login role={loginMatch[1]} onLogin={handleLoginSuccess} onBack={returnToRoles} onRegister={openStudentRegistration} />;
+  return <Landing onShowRoles={showRoles} onRoleSelect={(role) => navigate(`/login/${role}`)} />;
+}
+
+function RoleDashboardNotice({ role, onLogout }) {
+  const label = roleLabels[role];
+  return <main className="auth-page"><section className="auth-card"><p className="eyebrow">{label} dashboard</p><h1>Access confirmed.</h1><p className="muted">Your {label.toLowerCase()} account is authenticated. The {label.toLowerCase()} dashboard module will be connected when that team module is integrated.</p><button className="form-action" onClick={onLogout}>Sign out</button></section></main>;
 }
